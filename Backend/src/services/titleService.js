@@ -3,6 +3,12 @@ import { Title } from '../models/Title.js';
 import { SAMPLE_TITLES } from '../data/sampleTitles.js';
 import { isDbConnected } from '../config/db.js';
 
+// Helper to escape user input before constructing RegExp
+function escapeRegex(str) {
+  if (typeof str !== 'string') return '';
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 // In-Memory store fallback when MongoDB daemon is not running
 let inMemoryTitles = SAMPLE_TITLES.map((t, idx) => ({
   ...t,
@@ -50,7 +56,7 @@ export const titleService = {
       const query = {};
       if (type && type !== 'all') query.type = type.toLowerCase();
       if (genre && genre !== 'All Genres') query.genres = genre;
-      if (language && language !== 'All Languages') query.language = new RegExp(`^${language}$`, 'i');
+      if (language && language !== 'All Languages') query.language = new RegExp(`^${escapeRegex(language)}$`, 'i');
       if (mood) query.moodTags = mood.toLowerCase();
 
       let sortOption = {};
@@ -182,12 +188,12 @@ export const titleService = {
       const filter = {};
       if (q) {
         // Regex search across title, synopsis, director and cast for natural matching
-        const regex = new RegExp(q, 'i');
+        const safeRegex = new RegExp(escapeRegex(q), 'i');
         filter.$or = [
-          { title: regex },
-          { synopsis: regex },
-          { director: regex },
-          { cast: regex }
+          { title: safeRegex },
+          { synopsis: safeRegex },
+          { director: safeRegex },
+          { cast: safeRegex }
         ];
       }
 

@@ -24,13 +24,17 @@ export default function MovieDetails({
       }
     };
     window.addEventListener('keydown', handleKeyDown);
-    // Lock body scroll
-    document.body.style.overflow = 'hidden';
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'auto';
     };
   }, [onClose]);
+
+  // Reset image error and copied state whenever a new movie is selected
+  useEffect(() => {
+    setImgError(false);
+    setCopied(false);
+  }, [movie?.id, movie?.posterUrl]);
 
   if (!movie) return null;
 

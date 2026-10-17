@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star, Plus, Check, Bookmark, Calendar, Clock } from 'lucide-react';
 import { getPosterUrl, formatRating, PLACEHOLDER_POSTER } from '../utils/helpers';
 
@@ -10,6 +10,11 @@ export default function MovieCard({
 }) {
   const [imgError, setImgError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+
+  // Reset image error state if card receives a new movie or poster URL
+  useEffect(() => {
+    setImgError(false);
+  }, [movie?.id, movie?.posterUrl]);
 
   const posterSrc = imgError ? PLACEHOLDER_POSTER : getPosterUrl(movie.posterUrl);
 
