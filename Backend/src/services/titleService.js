@@ -10,13 +10,17 @@ function escapeRegex(str) {
 }
 
 // In-Memory store fallback when MongoDB daemon is not running
-let inMemoryTitles = SAMPLE_TITLES.map((t, idx) => ({
-  ...t,
-  _id: new mongoose.Types.ObjectId(`6640000000000000000000${(idx + 1).toString().padStart(2, '0')}`),
-  id: `6640000000000000000000${(idx + 1).toString().padStart(2, '0')}`,
-  createdAt: new Date(),
-  updatedAt: new Date()
-}));
+let inMemoryTitles = SAMPLE_TITLES.map((t, idx) => {
+  const num = (idx + 1) < 99 ? (idx + 1) : (idx + 2);
+  const idStr = `66400000000000000000${num.toString().padStart(4, '0')}`;
+  return {
+    ...t,
+    _id: new mongoose.Types.ObjectId(idStr),
+    id: idStr,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+});
 
 export const titleService = {
   /**
@@ -247,7 +251,17 @@ export const titleService = {
       return true;
     });
 
-    results.sort((a, b) => b.rating - a.rating);
+    results.sort((a, b) => {
+      if (q) {
+        const lowerQ = q.toLowerCase();
+        const aTitle = a.title?.toLowerCase() || '';
+        const bTitle = b.title?.toLowerCase() || '';
+        const aScore = aTitle === lowerQ ? 4 : (aTitle.startsWith(lowerQ) ? 3 : (aTitle.includes(lowerQ) ? 2 : 1));
+        const bScore = bTitle === lowerQ ? 4 : (bTitle.startsWith(lowerQ) ? 3 : (bTitle.includes(lowerQ) ? 2 : 1));
+        if (aScore !== bScore) return bScore - aScore;
+      }
+      return b.rating - a.rating;
+    });
     const total = results.length;
     const paginated = results.slice(skip, skip + limit);
 
