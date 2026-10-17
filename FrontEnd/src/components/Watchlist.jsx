@@ -39,7 +39,7 @@ export default function Watchlist({
                 Your Personal Watchlist
               </h1>
               <p className="text-sm text-cinelog-muted mt-0.5">
-                Saved titles automatically sync with your browser’s local storage
+                Saved titles synchronized via CineLog Backend REST API
               </p>
             </div>
           </div>
