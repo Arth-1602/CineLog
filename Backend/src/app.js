@@ -9,8 +9,19 @@ import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
 
+// Disable ETags to avoid 304 Not Modified empty responses upon browser refresh
+app.set('etag', false);
+
 // Security HTTP headers
 app.use(helmet());
+
+// Prevent stale caching on all /api endpoints
+app.use('/api', (req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
+});
 
 // CORS configuration
 app.use(

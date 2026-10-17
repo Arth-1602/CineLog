@@ -62,6 +62,7 @@ async function apiRequest(endpoint, options = {}) {
 
   try {
     const res = await fetch(url, {
+      cache: 'no-cache',
       ...options,
       headers
     });
@@ -77,7 +78,7 @@ async function apiRequest(endpoint, options = {}) {
       throw error;
     }
 
-    return data;
+    return data || {};
   } catch (err) {
     // Distinguish network connection failures
     if (err.name === 'TypeError' && err.message.includes('fetch')) {
@@ -119,8 +120,8 @@ export const api = {
     const result = await apiRequest(endpoint);
 
     return {
-      ...result,
-      data: (result.data || []).map(normalizeTitle)
+      ...(result || {}),
+      data: (result?.data || []).map(normalizeTitle)
     };
   },
 
@@ -130,7 +131,7 @@ export const api = {
   async getTitleById(id) {
     if (!id) throw new Error('Title ID is required');
     const result = await apiRequest(`/titles/${id}`);
-    return normalizeTitle(result.data);
+    return normalizeTitle(result?.data);
   },
 
   /**
@@ -150,8 +151,8 @@ export const api = {
     const result = await apiRequest(endpoint);
 
     return {
-      ...result,
-      data: (result.data || []).map(normalizeTitle)
+      ...(result || {}),
+      data: (result?.data || []).map(normalizeTitle)
     };
   },
 
@@ -161,8 +162,8 @@ export const api = {
   async getWatchlist() {
     const result = await apiRequest('/watchlist');
     return {
-      ...result,
-      data: (result.data || []).map(item => ({
+      ...(result || {}),
+      data: (result?.data || []).map(item => ({
         ...item,
         title: normalizeTitle(item.title)
       }))

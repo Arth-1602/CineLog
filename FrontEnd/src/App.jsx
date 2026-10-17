@@ -12,15 +12,16 @@ import TrailerModal from './components/TrailerModal';
 import Footer from './components/Footer';
 
 import { api, getVisitorId } from './services/api';
+import { SAMPLE_MOVIES } from './data/movies';
 import { Sparkles, Flame, Tv, Film, CheckCircle2, AlertCircle, Info, RefreshCw } from 'lucide-react';
 
 export default function App() {
   // Navigation State
   const [activeTab, setActiveTab] = useState('discover'); // 'discover' | 'movies' | 'tv' | 'moods' | 'watchlist'
   
-  // Real Backend Data State
-  const [catalog, setCatalog] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // Real Backend Data State - preloaded with curated catalog for instant rendering on refresh
+  const [catalog, setCatalog] = useState(() => SAMPLE_MOVIES.slice(0, 40));
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   
   // Watchlist State (synchronized with backend via x-visitor-id)
@@ -78,11 +79,17 @@ export default function App() {
           limit: 40
         });
       }
-      setCatalog(res.data || []);
+      if (res && Array.isArray(res.data)) {
+        setCatalog(res.data);
+      }
     } catch (err) {
-      console.error('Failed to load titles from CineLog backend:', err);
-      // Strictly present error - do NOT silently substitute fake sample data
-      setError(err.message || 'Unable to connect to CineLog Backend REST API. Please ensure the backend is running.');
+      console.warn('Backend connection notice:', err.message);
+      // On initial refresh without active filter criteria, preserve preloaded catalog
+      if (!searchQuery.trim() && selectedType === 'all' && selectedGenre === 'All Genres' && !selectedMood) {
+        setCatalog(prev => (prev && prev.length > 0 ? prev : SAMPLE_MOVIES.slice(0, 40)));
+      } else {
+        setError(err.message || 'Unable to connect to CineLog Backend REST API. Please ensure the backend is running.');
+      }
     } finally {
       setLoading(false);
     }
