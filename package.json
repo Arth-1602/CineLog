@@ -1,0 +1,9 @@
+{
+  "name": "cinelog-root",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix FrontEnd run dev",
+    "build": "npm --prefix FrontEnd run build",
+    "preview": "npm --prefix FrontEnd run preview"
+  }
+}
