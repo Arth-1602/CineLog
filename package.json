@@ -2,8 +2,11 @@
   "name": "cinelog-root",
   "private": true,
   "scripts": {
-    "dev": "npm --prefix FrontEnd run dev",
-    "build": "npm --prefix FrontEnd run build",
-    "preview": "npm --prefix FrontEnd run preview"
+    "dev:frontend": "npm --prefix FrontEnd run dev",
+    "dev:backend": "npm --prefix Backend run dev",
+    "start:backend": "npm --prefix Backend start",
+    "test:backend": "npm --prefix Backend test",
+    "build:frontend": "npm --prefix FrontEnd run build",
+    "seed:backend": "npm --prefix Backend run seed"
   }
 }
